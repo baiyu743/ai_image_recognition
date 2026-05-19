@@ -1,0 +1,49 @@
+# FastAPI和Web服务
+fastapi>=0.68.0
+uvicorn[standard]>=0.15.0
+python-multipart>=0.0.5
+SQLAlchemy>=1.4.0
+
+# 深度学习和计算机视觉
+torch>=1.7.0
+torchvision>=0.8.1
+opencv-python-headless>=4.6.0
+Pillow>=7.1.2
+numpy>=1.18.5
+ultralytics>=8.0.0
+segment-anything>=1.0
+pycocotools>=2.0.6
+
+# AI 和 LLM 支持
+openai>=1.0.0
+python-dotenv>=0.19.0
+
+# 数据处理和工具
+PyYAML>=5.3.1
+requests>=2.23.0
+scipy>=1.4.1
+tqdm>=4.64.0
+matplotlib>=3.2.2
+pandas>=1.1.4
+seaborn>=0.11.0
+
+# 机器学习工具
+scikit-learn>=1.0.2
+tensorboard>=2.4.1
+
+# 模型导出和优化
+onnx>=1.12.0
+onnxruntime; platform_system == "Darwin"
+onnxruntime-gpu; platform_system != "Darwin"
+onnx-simplifier>=0.4.1
+
+# 系统工具
+psutil
+thop>=0.1.1
+certifi>=2022.12.7
+
+# Hugging Face模型支持
+transformers>=4.0.0
+
+# 智能体数据增广（千问 API，OpenAI 兼容接口）
+openai>=1.0.0

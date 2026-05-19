@@ -1,0 +1,54 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Build started on `date`
+      - echo Checking server connection...
+      
+  build:
+    commands:
+      - echo Preparing deployment package...
+      - tar -czf deployment.tar.gz --exclude='.git' --exclude='node_modules' --exclude='__pycache__' .
+      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Deploying to production server...
+      - |
+        scp -o StrictHostKeyChecking=no deployment.tar.gz $DEPLOY_USER@$DEPLOY_HOST:/tmp/
+        ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST << 'EOF'
+        cd /opt/ai-backend
+        
+        # 备份当前数据库
+        if [ -f auto_annotate.db ]; then
+          cp auto_annotate.db auto_annotate.db.backup.$(date +%Y%m%d_%H%M%S)
+        fi
+        
+        # 停止当前服务
+        docker-compose down || true
+        
+        # 备份当前代码
+        if [ -d "backup" ]; then rm -rf backup; fi
+        mkdir backup
+        cp -r . backup/ 2>/dev/null || true
+        
+        # 解压新代码
+        tar -xzf /tmp/deployment.tar.gz -C /opt/ai-backend --overwrite
+        
+        # 构建并启动服务
+        docker-compose build --no-cache
+        docker-compose up -d --force-recreate
+        
+        # 清理临时文件
+        rm -f /tmp/deployment.tar.gz
+        
+        # 清理旧镜像
+        docker system prune -f
+        
+        # 健康检查
+        sleep 30
+        curl -f http://localhost/ || exit 1
+        
+        echo "Deployment completed successfully!"
+        EOF

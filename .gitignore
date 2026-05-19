@@ -1,0 +1,33 @@
+.DS_Store
+.DS_Store?
+._*
+
+# Local datasets / user data
+数据集/
+备忘录/
+
+# Backend runtime artifacts / user projects
+ai-image-recognition-backend/projects/
+ai-image-recognition-backend/runs/
+ai-image-recognition-backend/downloaded_models/
+ai-image-recognition-backend/user_models/
+ai-image-recognition-backend/*.pt
+ai-image-recognition-backend/*.pth
+ai-image-recognition-backend/*.onnx
+ai-image-recognition-backend/*.engine
+ai-image-recognition-backend/*.trt
+ai-image-recognition-backend/ai-backend.tar.gz
+ai-image-recognition-backend/Ultralytics/Ultralytics/persistent_cache.json
+ai-image-recognition-backend/Ultralytics/Ultralytics/settings.json
+
+# Common Python
+__pycache__/
+*.py[cod]
+.env
+.venv
+venv/
+env/
+
+# Common Node
+node_modules/
+dist/

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  ai-backend:
+    build: .
+    container_name: ai-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # 暴露后端API端口
+    volumes:
+      - ./uploads:/app/uploads
+      - ./models:/app/models
+      - ./logs:/app/logs
+      - ./auto_annotate.db:/app/auto_annotate.db
+    environment:
+      - ENVIRONMENT=production
+    env_file:
+      - .env.production
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-network
+
+  ai-frontend:
+    build: ../ai_image_recognition_frontend
+    container_name: ai-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - ai-backend
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    driver: bridge
+
+volumes:
+  uploads:
+  models:
+  logs:
