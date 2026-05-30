@@ -847,7 +847,11 @@ def _safe_join(base_dir: str, *parts: str) -> str:
 
 def _load_project_dataset(project_id: str) -> Dict[str, Any]:
     meta = _read_project_meta(project_id)
-    dataset_yaml_path = meta.get("dataset_yaml_path") or os.path.join(_project_dir(project_id), "data", "dataset.yaml")
+    dataset_yaml_path = meta.get("dataset_yaml_path")
+    path_was_stale = bool(dataset_yaml_path and not os.path.exists(os.path.abspath(dataset_yaml_path)))
+    if path_was_stale:
+        dataset_yaml_path = None
+    dataset_yaml_path = dataset_yaml_path or os.path.join(_project_dir(project_id), "data", "dataset.yaml")
     dataset_yaml_path = os.path.abspath(dataset_yaml_path)
     if not os.path.exists(dataset_yaml_path):
         raise HTTPException(status_code=404, detail="dataset.yaml not found for project")
@@ -856,6 +860,13 @@ def _load_project_dataset(project_id: str) -> Dict[str, Any]:
     data_root = cfg.get("path") or os.path.dirname(dataset_yaml_path)
     if not os.path.isabs(data_root):
         data_root = os.path.abspath(os.path.join(os.path.dirname(dataset_yaml_path), data_root))
+    data_root_stale = not os.path.exists(data_root)
+    if data_root_stale:
+        data_root = os.path.dirname(dataset_yaml_path)
+    if path_was_stale or data_root_stale:
+        meta["dataset_yaml_path"] = dataset_yaml_path
+        meta["updated_at"] = datetime.utcnow().isoformat()
+        _write_project_meta(project_id, meta)
     names = cfg.get("names") or []
     if isinstance(names, dict):
         names = [names[k] for k in sorted(names.keys(), key=lambda x: int(x) if str(x).isdigit() else str(x))]
@@ -910,7 +921,10 @@ def _write_dataset_yaml(data_root: str, names: List[str], dataset_yaml_path: str
 
 def _load_or_init_dataset_yaml(project_id: str) -> Dict[str, Any]:
     meta = _read_project_meta(project_id)
-    dataset_yaml_path = meta.get("dataset_yaml_path") or os.path.join(_project_dir(project_id), "data", "dataset.yaml")
+    dataset_yaml_path = meta.get("dataset_yaml_path")
+    if dataset_yaml_path and not os.path.exists(os.path.abspath(dataset_yaml_path)):
+        dataset_yaml_path = None
+    dataset_yaml_path = dataset_yaml_path or os.path.join(_project_dir(project_id), "data", "dataset.yaml")
     dataset_yaml_path = os.path.abspath(dataset_yaml_path)
     if not os.path.exists(dataset_yaml_path):
         paths = _ensure_project_dirs(project_id)

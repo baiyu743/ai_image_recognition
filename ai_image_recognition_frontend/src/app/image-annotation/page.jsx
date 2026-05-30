@@ -34,7 +34,7 @@ import {
   uploadProjectStagingImages,
 } from "@/api/annotation";
 import { runAugmentation } from "@/api/augmentation";
-import { visioFirmAPI } from "@/api/visiofirm";
+import { visioFirmAPI } from "@/api/visioFirm";
 import { getApiUrl } from "@/lib/api";
 import { getCurrentProject } from "@/lib/projectManager";
 import { useAnnotationStore } from "@/store/annotationStore";
